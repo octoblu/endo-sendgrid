@@ -1,5 +1,6 @@
-_ = require 'lodash'
+_                = require 'lodash'
 PassportStrategy = require 'passport-strategy'
+url              = require 'url'
 
 class SendgridStrategy extends PassportStrategy
   constructor: (env) ->
@@ -8,8 +9,17 @@ class SendgridStrategy extends PassportStrategy
     super
 
   authenticate: (req, options) -> # keep this skinny
-    return @redirect @authorizationURL unless req.body.apiKey
+    return @redirectToAuthorizationUrl() unless req.body.apiKey
     @success {id: 'foo'}
+
+  redirectToAuthorizationUrl: ->
+    {protocol, hostname, port, pathname} = url.parse @authorizationURL
+    query = {
+      postUrl: ''
+      schemaUrl: ''
+      bearerToken: ''
+    }
+    return @redirect url.format {protocol, hostname, port, pathname, query}
 
 
 module.exports = SendgridStrategy

@@ -63,8 +63,12 @@ describe 'Authentication with Sendgrid', ->
           done error
 
       it 'should redirect to the Form Service', ->
-        location = @response.headers.location
-        expect(location).to.deep.equal 'http://form.biz', @response.body
+        {hostname, query} = url.parse @response.headers.location, true
+        expect(hostname).to.deep.equal 'form.biz', @response.body
+        expect(query).to.deep.equal
+          schemaUrl: ''
+          postUrl: ''
+          bearerToken: ''
 
     describe 'When Sendgrid authentication is sent', ->
       beforeEach 'making the request', (done) ->
