@@ -1,14 +1,8 @@
-Github = require 'github'
 http   = require 'http'
 _      = require 'lodash'
 
 class ListEventsByUser
   constructor: ({@encrypted}) ->
-    console.log '@encrypted', JSON.stringify @encrypted
-    @github = new Github
-      debug: true
-    @github.authenticate type: 'oauth', token: @encrypted.secrets.credentials.secret
-
 
   do: ({data}, callback) =>
     return callback @_userError(422, 'data.username is required') unless data.username?

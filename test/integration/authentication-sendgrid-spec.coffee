@@ -27,7 +27,7 @@ describe 'Authentication with Sendgrid', ->
   beforeEach 'start Endo', (done) ->
     @sut = new ApiStrategy {
       ENDO_SENDGRID_SENDGRID_CALLBACK_URL: 'http://service.biz'
-      ENDO_SENDGRID_SENDGRID_OAUTH_URL: 'http://form.biz'
+      ENDO_SENDGRID_SENDGRID_AUTH_URL: 'http://form.biz'
       ENDO_SENDGRID_SENDGRID_SCHEMA_URL: 'http://schema.biz/schema.json'
     }
 
