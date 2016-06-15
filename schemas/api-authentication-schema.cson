@@ -1,0 +1,8 @@
+{
+  type: "object"
+  properties:
+    apiKey:
+      type: "string"
+      minLength: 69
+      maxLength: 69
+}

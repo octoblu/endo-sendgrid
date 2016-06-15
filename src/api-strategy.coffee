@@ -4,22 +4,38 @@ url              = require 'url'
 
 class SendgridStrategy extends PassportStrategy
   constructor: (env) ->
-    throw new Error('Missing required environment variable: ENDO_SENDGRID_SENDGRID_CLIENT_ID') if _.isEmpty env.ENDO_SENDGRID_SENDGRID_OAUTH_URL
-    @authorizationURL = env.ENDO_SENDGRID_SENDGRID_OAUTH_URL
+    if _.isEmpty env.ENDO_SENDGRID_SENDGRID_CALLBACK_URL
+      throw new Error('Missing required environment variable: ENDO_SENDGRID_SENDGRID_CALLBACK_URL')
+    if _.isEmpty env.ENDO_SENDGRID_SENDGRID_OAUTH_URL
+      throw new Error('Missing required environment variable: ENDO_SENDGRID_SENDGRID_OAUTH_URL')
+    if _.isEmpty env.ENDO_SENDGRID_SENDGRID_SCHEMA_URL
+      throw new Error('Missing required environment variable: ENDO_SENDGRID_SENDGRID_SCHEMA_URL')
+
+    @_authorizationUrl = env.ENDO_SENDGRID_SENDGRID_OAUTH_URL
+    @_callbackUrl      = env.ENDO_SENDGRID_SENDGRID_CALLBACK_URL
+    @_schemaUrl        = env.ENDO_SENDGRID_SENDGRID_SCHEMA_URL
     super
 
-  authenticate: (req, options) -> # keep this skinny
-    return @redirectToAuthorizationUrl() unless req.body.apiKey
+  authenticate: (req) -> # keep this skinny
+    {bearerToken} = req.meshbluAuth
+    return @redirect @authorizationUrl({bearerToken}) unless req.body.apiKey
     @success {id: 'foo'}
 
-  redirectToAuthorizationUrl: ->
-    {protocol, hostname, port, pathname} = url.parse @authorizationURL
+  authorizationUrl: ({bearerToken}) ->
+    {protocol, hostname, port, pathname} = url.parse @_authorizationUrl
     query = {
-      postUrl: ''
-      schemaUrl: ''
-      bearerToken: ''
+      postUrl: @postUrl()
+      schemaUrl: @schemaUrl()
+      bearerToken: bearerToken
     }
-    return @redirect url.format {protocol, hostname, port, pathname, query}
+    return url.format {protocol, hostname, port, pathname, query}
+
+  postUrl: ->
+    {protocol, hostname, port} = url.parse @_callbackUrl
+    return url.format {protocol, hostname, port, pathname: '/auth/api/callback'}
+
+  schemaUrl: ->
+    @_schemaUrl
 
 
 module.exports = SendgridStrategy

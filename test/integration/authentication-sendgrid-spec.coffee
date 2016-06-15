@@ -26,7 +26,9 @@ describe 'Authentication with Sendgrid', ->
 
   beforeEach 'start Endo', (done) ->
     @sut = new ApiStrategy {
+      ENDO_SENDGRID_SENDGRID_CALLBACK_URL: 'http://service.biz'
       ENDO_SENDGRID_SENDGRID_OAUTH_URL: 'http://form.biz'
+      ENDO_SENDGRID_SENDGRID_SCHEMA_URL: 'http://schema.biz/schema.json'
     }
 
     endoOptions = {
@@ -43,7 +45,7 @@ describe 'Authentication with Sendgrid', ->
       followRedirect: false
       auth:
         username: 'bogus'
-        password: 'also bogus'
+        password: 'also-bogus'
       baseUrl: url.format
         protocol: 'http'
         hostname: 'localhost'
@@ -63,12 +65,20 @@ describe 'Authentication with Sendgrid', ->
           done error
 
       it 'should redirect to the Form Service', ->
-        {hostname, query} = url.parse @response.headers.location, true
+        {hostname} = url.parse @response.headers.location, true
         expect(hostname).to.deep.equal 'form.biz', @response.body
-        expect(query).to.deep.equal
-          schemaUrl: ''
-          postUrl: ''
-          bearerToken: ''
+
+      it 'should pass the postUrl as a query param', ->
+        {query} = url.parse @response.headers.location, true
+        expect(query).to.containSubset postUrl: 'http://service.biz/auth/api/callback'
+
+      it 'should pass the schemaUrl as a query param', ->
+        {query} = url.parse @response.headers.location, true
+        expect(query).to.containSubset schemaUrl: 'http://schema.biz/schema.json'
+
+      it 'should pass the bearerToken as a query param', ->
+        {query} = url.parse @response.headers.location, true
+        expect(query).to.containSubset bearerToken: new Buffer('bogus:also-bogus').toString 'base64'
 
     describe 'When Sendgrid authentication is sent', ->
       beforeEach 'making the request', (done) ->
