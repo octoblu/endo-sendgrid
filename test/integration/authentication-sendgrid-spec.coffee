@@ -24,11 +24,16 @@ describe 'Authentication with Sendgrid', ->
     @meshblu.put('/v2/devices/it').reply 204
     @meshblu.post('/v2/devices/it/subscriptions/it/message.received').reply 201
 
+  beforeEach 'start Sendgrid', ->
+    @sendgrid = shmock()
+    enableDestroy @sendgrid
+
   beforeEach 'start Endo', (done) ->
     @sut = new ApiStrategy {
       ENDO_SENDGRID_SENDGRID_CALLBACK_URL: 'http://service.biz'
       ENDO_SENDGRID_SENDGRID_AUTH_URL: 'http://form.biz'
       ENDO_SENDGRID_SENDGRID_SCHEMA_URL: 'http://schema.biz/schema.json'
+      ENDO_SENDGRID_SENDGRID_API_URL: "http://localhost:#{@sendgrid.address().port}"
     }
 
     endoOptions = {
@@ -52,10 +57,13 @@ describe 'Authentication with Sendgrid', ->
         port: @endo.address().port
     }
 
-  afterEach (done) ->
+  afterEach 'destroy Endo', (done) ->
     @endo.stop done
 
-  afterEach (done) ->
+  afterEach 'destroy Sendgrid', (done) ->
+    @sendgrid.destroy done
+
+  afterEach 'destroy Meshblu', (done) ->
     @meshblu.destroy done
 
   describe 'When an Octoblu is authenticated', ->
@@ -81,11 +89,27 @@ describe 'Authentication with Sendgrid', ->
         expect(query).to.containSubset bearerToken: new Buffer('bogus:also-bogus').toString 'base64'
 
     describe 'When Sendgrid authentication is sent', ->
-      beforeEach 'making the request', (done) ->
-        body = {apiKey: 'zaboomafoo'}
-        @request.post '/auth/api/callback', json: body, (error, @response) =>
-          done error
+      describe 'when sendgrid validates the API key', ->
+        beforeEach 'sendgrid validates', ->
+          @sendgrid.get('/v3/user/username').reply 200, {username: 'joe-bob', user_id: 123}
 
-      it 'should redirect to the endo-manager', ->
-        {hostname} = url.parse @response.headers.location
-        expect(hostname).to.deep.equal 'manager.biz', JSON.stringify @response.body
+        beforeEach 'making the request', (done) ->
+          body = {apiKey: 'zaboomafoo'}
+          @request.post '/auth/api/callback', json: body, (error, @response) =>
+            done error
+
+        it 'should redirect to the endo-manager', ->
+          {hostname} = url.parse @response.headers.location
+          expect(hostname).to.deep.equal 'manager.biz', JSON.stringify @response.body
+
+      describe 'when sendgrid invalidates the API key', ->
+        beforeEach 'sendgrid validates', ->
+          @sendgrid.get('/v3/user/username').reply 401, 'Unauthorized'
+
+        beforeEach 'making the request', (done) ->
+          body = {apiKey: 'zaboomafoo'}
+          @request.post '/auth/api/callback', json: body, (error, @response) =>
+            done error
+
+        it 'should yield a 401', ->
+          expect(@response.statusCode).to.equal 401
