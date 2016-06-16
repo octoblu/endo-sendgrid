@@ -1,9 +1,12 @@
 {
   type: 'object'
   properties:
-    apiKey:
-      title: 'Api Key'
+    username:
+      title: 'Username'
       type: 'string'
-      minLength: 69
-      maxLength: 69
+      minLength: 1
+    password:
+      title: 'Password'
+      type: 'string'
+      minLength: 1
 }

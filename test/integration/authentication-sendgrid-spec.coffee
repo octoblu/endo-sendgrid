@@ -33,6 +33,7 @@ describe 'Authentication with Sendgrid', ->
       ENDO_SENDGRID_SENDGRID_CALLBACK_URL: 'http://service.biz'
       ENDO_SENDGRID_SENDGRID_AUTH_URL: 'http://form.biz'
       ENDO_SENDGRID_SENDGRID_SCHEMA_URL: 'http://schema.biz/schema.json'
+      ENDO_SENDGRID_SENDGRID_FORM_SCHEMA_URL: 'http://schema.biz/form-schema.json'
       ENDO_SENDGRID_SENDGRID_API_URL: "http://localhost:#{@sendgrid.address().port}"
     }
 
@@ -84,6 +85,10 @@ describe 'Authentication with Sendgrid', ->
         {query} = url.parse @response.headers.location, true
         expect(query).to.containSubset schemaUrl: 'http://schema.biz/schema.json'
 
+      it 'should pass the formSchemaUrl as a query param', ->
+        {query} = url.parse @response.headers.location, true
+        expect(query).to.containSubset formSchemaUrl: 'http://schema.biz/form-schema.json'
+
       it 'should pass the bearerToken as a query param', ->
         {query} = url.parse @response.headers.location, true
         expect(query).to.containSubset bearerToken: new Buffer('bogus:also-bogus').toString 'base64'
@@ -91,12 +96,18 @@ describe 'Authentication with Sendgrid', ->
     describe 'When Sendgrid authentication is sent', ->
       describe 'when sendgrid validates the API key', ->
         beforeEach 'sendgrid validates', ->
-          @sendgrid.get('/v3/user/username').reply 200, {username: 'joe-bob', user_id: 123}
+          @sendgrid
+            .get '/api/profile.get.json'
+            .query api_user: 'joe-bob', api_key: 'zaboomafoo'
+            .reply 200, [{username: 'joe-bob'}]
 
         beforeEach 'making the request', (done) ->
-          body = {apiKey: 'zaboomafoo'}
+          body = {username: 'joe-bob', password: 'zaboomafoo'}
           @request.post '/auth/api/callback', json: body, (error, @response) =>
             done error
+
+        it 'should yield a 201', ->
+          expect(@response.statusCode).to.equal 201, JSON.stringify @response.body
 
         it 'should redirect to the endo-manager', ->
           {hostname} = url.parse @response.headers.location
@@ -104,10 +115,13 @@ describe 'Authentication with Sendgrid', ->
 
       describe 'when sendgrid invalidates the API key', ->
         beforeEach 'sendgrid validates', ->
-          @sendgrid.get('/v3/user/username').reply 401, 'Unauthorized'
+          @sendgrid
+            .get '/api/profile.get.json'
+            .query api_user: 'joe-bob', api_key: 'zaboomafoo'
+            .reply 200, {error: {code: 401}} # Yes, this is really the API
 
         beforeEach 'making the request', (done) ->
-          body = {apiKey: 'zaboomafoo'}
+          body = {username: 'joe-bob', password: 'zaboomafoo'}
           @request.post '/auth/api/callback', json: body, (error, @response) =>
             done error
 
