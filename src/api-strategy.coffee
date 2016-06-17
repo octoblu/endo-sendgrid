@@ -34,8 +34,7 @@ class SendgridStrategy extends PassportStrategy
         id:       user.username
         username: user.username
         secrets:
-          credentials:
-            secret: req.body.apiKey
+          credentials: {username, password}
       }
 
   authorizationUrl: ({bearerToken}) ->

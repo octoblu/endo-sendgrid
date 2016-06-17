@@ -1,27 +1,39 @@
 {
   type: 'object'
-  title: 'Image Attachment'
+  title: 'Send Email with Image'
   'x-group-name': 'Send Email'
   required: ['data']
   properties:
     data:
       type: 'object'
-      required: ['from','to', 'subject']
+      required: ['from', 'to', 'subject', 'text', 'image']
       properties:
         from:
           type: 'string'
-          required: true
+          title: 'From'
+          description: 'Email adress the message will appear to be sent from'
         to:
           type: 'string'
-          required: true
+          title: 'To'
+          description: 'Comma separated list of email adresses'
         subject:
           type: 'string'
-          required: true
+          title: 'Subject'
+          description: 'Subject line.'
         text:
           type: 'string'
-          required: true
+          title: 'Text'
+          description: 'The text body.'
         html:
           type: 'string'
-          default: '<p></p>'
-        b64: type: 'string'
+          title: 'HTML'
+          description: 'The HTML body. Will be included in addition to the text body.'
+        filename:
+          type: 'string'
+          title: 'Filename'
+          description: 'The filename the image will be attached as.'
+        image:
+          type: 'string'
+          title: 'Image'
+          description: "Expected to be base64 encoded"
 }

@@ -1,36 +1,26 @@
-http   = require 'http'
-_      = require 'lodash'
+http       = require 'http'
+_          = require 'lodash'
+nodemailer = require 'nodemailer'
+url        = require 'url'
 
 class SendEmailWithImage
-  constructor: ({@encrypted}) ->
-    @sendgrid = require('sendgrid')(@encrypted.username, @encrypted.password)
+  constructor: ({encrypted}) ->
+    console.log JSON.stringify {encrypted}
+    {username, password} = encrypted.secrets.credentials
+
+    @mailer = nodemailer.createTransport url.format({
+      protocol: 'smtps'
+      hostname: 'smtp.sendgrid.net'
+      port: 465
+      auth: "#{username}:#{password}"
+    })
 
   do: ({data}, callback) =>
-    return callback @_userError(422, 'data.to is required') unless data.to?
+    @mailer.sendMail @mailOptions(data), (error, info) =>
+      callback error, info
 
-    email = new @sendgrid.Email()
-    {to, subject, from, text, html, filename, b64} = data
-
-    email.to      = to
-    email.subject = subject
-    email.from    = from
-    email.text    = text
-    email.html    = html
-
-    img = b64
-    rawData = img.replace(/^data:image\/\w+;base64,/, "")
-    file = new Buffer(rawData, 'base64')
-    filename = 'octoblu.jpeg'
-    email.addFile {filename: filename, content:  file}
-
-    @sendgrid.send email, (error, json) =>
-      return callback error if error?
-      return callback null, {
-        metadata:
-          code: 200
-          status: http.STATUS_CODES[200]
-        data: _processResults results
-      }
+  mailOptions: ({from, to, subject, text, html, filename, image}) =>
+    return {from, to, subject, text, html, attachments: [{ filename, content: new Buffer(image, 'base64') }]}
 
   _processResult: (result) =>
     {

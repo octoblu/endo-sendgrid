@@ -1,6 +1,6 @@
 {
   "name": "endo-sendgrid",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Put some description here",
   "keywords": [],
   "homepage": "https://github.com/octoblu/sendgrid",
@@ -51,11 +51,11 @@
     "meshblu-config": "^4.0.0",
     "meshblu-encryption": "^1.0.3",
     "morgan": "^1.6.1",
+    "nodemailer": "^2.4.2",
     "passport": "^0.3.2",
     "passport-octoblu": "^2.0.1",
     "passport-strategy": "^1.0.0",
-    "request": "^2.72.0",
-    "sendgrid": "^3.0.5"
+    "request": "^2.72.0"
   },
   "peerDependencies": {},
   "engines": {
