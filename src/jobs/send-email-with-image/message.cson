@@ -23,9 +23,5 @@
         html:
           type: 'string'
           default: '<p></p>'
-        filename:
-          type: 'string'
-        b64:
-          type: 'string'
-
+        b64: type: 'string'
 }
