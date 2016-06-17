@@ -1,5 +1,4 @@
 http       = require 'http'
-_          = require 'lodash'
 nodemailer = require 'nodemailer'
 url        = require 'url'
 
@@ -16,19 +15,16 @@ class SendEmailWithImage
     })
 
   do: ({data}, callback) =>
-    @mailer.sendMail @mailOptions(data), (error, info) =>
-      callback error, info
+    @mailer.sendMail @mailOptions(data), (error) =>
+      return callback error if error?
+      callback null, {
+        metadata:
+          code: 201
+          status: http.STATUS_CODES[201]
+      }
 
   mailOptions: ({from, to, subject, text, html, filename, image}) =>
     return {from, to, subject, text, html, attachments: [{ filename, content: new Buffer(image, 'base64') }]}
-
-  _processResult: (result) =>
-    {
-      response: result
-    }
-
-  _processResults: (results) =>
-    _.map results, @_processResult
 
   _userError: (code, message) =>
     error = new Error message
