@@ -6,7 +6,7 @@ class SendEmailWithImage
     @sendgrid = require('sendgrid')(@encrypted.username, @encrypted.password)
 
   do: ({data}, callback) =>
-    # return callback @_userError(422, 'data.username is required') unless data.username?
+    return callback @_userError(422, 'data.to is required') unless data.to?
 
     email = new @sendgrid.Email()
     {to, subject, from, text, html, filename, b64} = data
@@ -29,15 +29,12 @@ class SendEmailWithImage
         metadata:
           code: 200
           status: http.STATUS_CODES[200]
-        data: results
+        data: _processResults results
       }
 
   _processResult: (result) =>
     {
-      createdAt:   result.created_at
-      description: result.payload.description
-      type:        result.type
-      username:    result.actor.display_login
+      response: result
     }
 
   _processResults: (results) =>
