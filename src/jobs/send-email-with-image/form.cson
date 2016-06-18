@@ -1,6 +1,6 @@
 {
   angular: [
-    { key: 'data.from', type: 'email' }
+    { key: 'data.from'}
     { key: 'data.to' }
     { key: 'data.subject' }
     { key: 'data.text', type: 'textarea' }
