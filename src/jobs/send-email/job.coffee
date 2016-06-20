@@ -4,7 +4,6 @@ url        = require 'url'
 
 class SendEmail
   constructor: ({encrypted}) ->
-    console.log JSON.stringify {encrypted}
     {username, password} = encrypted.secrets.credentials
 
     @mailer = nodemailer.createTransport url.format({

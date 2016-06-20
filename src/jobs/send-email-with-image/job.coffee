@@ -4,7 +4,6 @@ url        = require 'url'
 
 class SendEmailWithImage
   constructor: ({encrypted}) ->
-    console.log JSON.stringify {encrypted}
     {username, password} = encrypted.secrets.credentials
 
     @mailer = nodemailer.createTransport url.format({
