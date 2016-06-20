@@ -2,7 +2,7 @@ http       = require 'http'
 nodemailer = require 'nodemailer'
 url        = require 'url'
 
-class SendEmailWithImage
+class SendEmail
   constructor: ({encrypted}) ->
     console.log JSON.stringify {encrypted}
     {username, password} = encrypted.secrets.credentials
@@ -23,13 +23,12 @@ class SendEmailWithImage
           status: http.STATUS_CODES[201]
       }
 
-  mailOptions: ({from, to, subject, text, html, filename, image}) =>
-    filename ?= 'attachment'
-    return {from, to, subject, text, html, attachments: [{ filename, content: new Buffer(image, 'base64') }]}
+  mailOptions: ({from, to, subject, text, html}) =>
+    return {from, to, subject, text, html}
 
   _userError: (code, message) =>
     error = new Error message
     error.code = code
     return error
 
-module.exports = SendEmailWithImage
+module.exports = SendEmail

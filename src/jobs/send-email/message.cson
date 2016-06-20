@@ -1,0 +1,31 @@
+{
+  type: 'object'
+  title: 'Send Email'
+  'x-group-name': 'Send Email'
+  required: ['data']
+  properties:
+    data:
+      type: 'object'
+      required: ['from', 'to', 'subject', 'text']
+      properties:
+        from:
+          type: 'string'
+          title: 'From'
+          description: 'Email adress the message will appear to be sent from'
+        to:
+          type: 'string'
+          title: 'To'
+          description: 'Comma separated list of email adresses'
+        subject:
+          type: 'string'
+          title: 'Subject'
+          description: 'Subject line.'
+        text:
+          type: 'string'
+          title: 'Text'
+          description: 'The text body.'
+        html:
+          type: 'string'
+          title: 'HTML'
+          description: 'The HTML body. Will be included in addition to the text body.'
+}
