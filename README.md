@@ -1,10 +1,13 @@
 # endo-sendgrid
 
+[![Build Status](https://travis-ci.org/octoblu/endo-sendgrid.svg?branch=master)](https://travis-ci.org/octoblu/endo-sendgrid)
+[![Test Coverage](https://codecov.io/gh/octoblu/endo-sendgrid/branch/master/graph/badge.svg)](https://codecov.io/gh/octoblu/endo-sendgrid)
 [![Dependency status](http://img.shields.io/david/octoblu/endo-sendgrid.svg?style=flat)](https://david-dm.org/octoblu/endo-sendgrid)
 [![devDependency Status](http://img.shields.io/david/dev/octoblu/endo-sendgrid.svg?style=flat)](https://david-dm.org/octoblu/endo-sendgrid#info=devDependencies)
-[![Build Status](http://img.shields.io/travis/octoblu/endo-sendgrid.svg?style=flat&branch=master)](https://travis-ci.org/octoblu/endo-sendgrid)
+[![Slack Status](http://community-slack.octoblu.com/badge.svg)](http://community-slack.octoblu.com)
 
 [![NPM](https://nodei.co/npm/endo-sendgrid.svg?style=flat)](https://npmjs.org/package/endo-sendgrid)
+
 
 ## Installing
 
