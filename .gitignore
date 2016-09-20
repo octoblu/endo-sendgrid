@@ -28,3 +28,4 @@ node_modules
 
 meshblu.json
 .bin-dev
+.nyc_output
